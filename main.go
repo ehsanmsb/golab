@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -8,6 +9,11 @@ import (
 	"net/url"
 	"os"
 )
+
+type ReponseDetail struct {
+	IP        string
+	UserAgent string
+}
 
 func main() {
 
@@ -37,7 +43,16 @@ func main() {
 		log.Fatal(err)
 	}
 
+	defer resp.Body.Close()
+
 	fmt.Printf("The url status is %d\n", resp.StatusCode)
 	fmt.Printf("The response is %v", string(body))
+
+	responseStr := ReponseDetail{}
+	err = json.Unmarshal(body, &responseStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("\nUser IP: %s\nUser Agent: %s", responseStr.IP, responseStr.UserAgent)
 
 }
